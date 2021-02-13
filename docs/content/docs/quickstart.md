@@ -49,6 +49,17 @@ The `r-release` branch will always point to the latest R release. If you want a 
 library(devtools)
 install_github('facultyai/dash-bootstrap-components@r0.10.0')
 ```
+-----
+Julia
+To get started make sure you have [installed Dash.jl](https://dash-julia.plotly.com/installation). You can then install _dash-bootstrap-components_ from the `jl-release` branch of our GitHub repository.
+
+```julia-repl
+julia> using Pkg;
+
+julia> Pkg.add(PackageSpec(
+           url="https://github.com/facultyai/dash-bootstrap-components", rev="jl-release"
+       ))
+```
 ~~~
 
 ## Basic usage
@@ -90,6 +101,14 @@ library(dashBootstrapComponents)
 
 app <- Dash$new(external_stylesheets = dbcThemes$BOOTSTRAP)
 ```
+-----
+Julia
+
+```julia
+using Dash, DashBootstrapComponents
+
+app = dash(external_stylesheets = [dbc_themes.BOOTSTRAP])
+```
 ~~~
 
 For more information on available themes see the [_themes documentation_][docs-themes]
@@ -100,6 +119,8 @@ With CSS linked, you can start building your app's layout with our Bootstrap com
 
 ~~~bootstrap-tabs
 Python
+This is a minimal Dash app written in Python.
+
 ```python
 import dash
 import dash_bootstrap_components as dbc
@@ -116,6 +137,7 @@ if __name__ == "__main__":
 ```
 -----
 R
+This is a minimal Dash app written in R.
 
 ```r
 library(dash)
@@ -128,7 +150,22 @@ app$layout(dbcContainer(dbcAlert("Hello Bootstrap!", color = "success"),
 
 app$run_server(showcase = TRUE)
 ```
+-----
+Julia
+This is a minimal Dash app written in Julia.
 
+```julia
+using Dash, DashBootstrapComponents
+
+(app = dash(external_stylesheets = [dbc_themes.BOOTSTRAP]))
+
+app.layout = dbc_container(
+    dbc_alert("Hello Bootstrap!", color="success"),
+    className="p-5",
+)
+
+run_server(app, "0.0.0.0", 8080)
+```
 ~~~
 
 [dash-docs]: https://dash.plotly.com

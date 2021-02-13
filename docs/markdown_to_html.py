@@ -20,7 +20,7 @@ CHANGELOG_HTML_TEMPLATE = """{% extends "changelog.html" %}
 {% block content %}<CONTENT>{% endblock %}
 """
 
-TAB_OUTER_TEMPLATE = """<div class="card">
+TAB_OUTER_TEMPLATE = """<div class="card mb-3">
   <div class="card-header">
     <ul class="nav nav-tabs card-header-tabs{classes}"{id_value} role="tablist">{tabs}</ul>
   </div>
@@ -35,9 +35,14 @@ TAB_TEMPLATE = """<li class="nav-item" role="presentation">
 
 TAB_PANE_TEMPLATE = """<div class="tab-pane fade show{2}" id="{0}" role="tabpanel" aria-labelledby="{0}-tab">{1}</div>"""
 
+TAB_COUNT = 0
+
 
 def tab_formatter(source, language, class_name, options, md, **kwargs):
     """Format source as tabs."""
+    global TAB_COUNT
+    TAB_COUNT += 1
+
     source = [chunk.split("\n", 1) for chunk in source.split("-----\n")]
 
     classes = kwargs["classes"]
@@ -58,7 +63,7 @@ def tab_formatter(source, language, class_name, options, md, **kwargs):
     tabs = ""
     tab_panes = ""
     for i, (tab_name, tab_content) in enumerate(source):
-        tab_id = re.sub(r"\s", "_", tab_name).lower()
+        tab_id = re.sub(r"\s", "_", tab_name).lower() + str(TAB_COUNT)
         tabs += TAB_TEMPLATE.format(
             tab_id,
             tab_name,
