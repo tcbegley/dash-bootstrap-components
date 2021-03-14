@@ -35,7 +35,7 @@ def prerelease(ctx, version):
     run(f"git checkout -b prerelease/{version}")
     run(
         "git add package.json package-lock.json "
-        "dash_bootstrap_components/__init__.py "
+        "dash_bootstrap_components/_version.py "
         "tests/test_version.py"
     )
     run(f'git commit -m "Prerelease {version}"')
@@ -224,7 +224,12 @@ def move_generated_files(ctx):
     for file_ in chain(dir_.glob("*.py"), dir_.glob("*.json")):
         filename = file_.name
 
-        if filename in ("__init__.py", "_table.py", "themes.py"):
+        if filename in (
+            "__init__.py",
+            "_table.py",
+            "_version.py",
+            "themes.py",
+        ):
             continue
 
         if filename == "_imports_.py":
