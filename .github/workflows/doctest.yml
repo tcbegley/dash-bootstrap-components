@@ -1,12 +1,12 @@
 name: Test doc snippets
 
-on:
-  push:
-    paths:
-      - docs/components_page/**
-  pull_request:
-    paths:
-      - docs/components_page/**
+on: [push, pull_request]
+  # push:
+  #   # paths:
+  #     # - docs/components_page/**
+  # pull_request:
+  #   # paths:
+  #   #   - docs/components_page/**
 
 jobs:
   build-and-test:
@@ -38,10 +38,15 @@ jobs:
         run: npm run build
       - uses: r-lib/actions/setup-r@v1
         with:
-          r-version: '3.6.3'
+          r-version: '4.1.0'
+      - name: Install R dependencies from cran2deb4ubuntu
+        run: |
+          sudo add-apt-repository ppa:c2d4u.team/c2d4u4.0+
+          sudo apt-get update
+          sudo apt-get install r-cran-devtools r-cran-dash
       - name: Install R dependencies
         run: |
-          install.packages(c('dash', 'devtools'))
+          install.packages(c("devtools", "dash"))
           library(devtools)
           install_github('facultyai/dash-bootstrap-components@r-release')
         shell: Rscript {0}
