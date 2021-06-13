@@ -42,7 +42,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install r-recommended r-cran-dash
       - name: Install R package
-        run: R CMD INSTALL .
+        run: sudo R CMD INSTALL .
       - name: Test installation
         run: library(dashBootstrapComponents)
         shell: Rscript {0}
