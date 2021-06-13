@@ -26,20 +26,16 @@ PARAMS = [
 ]
 
 SKIP = ["components/table/kwargs.py", "components/tabs/active_tab.py"]
-ENVS = defaultdict(
-    dict,
-    {
-        "modal.md": {
-            "LOREM": (HERE.parent / "modal" / "lorem.txt").read_text().strip()
-        }
-    },
-)
+ENVS = {
+    "modal.md": {
+        "LOREM": (HERE.parent / "modal" / "lorem.txt").read_text().strip()
+    }
+}
 
 
 def compare_layouts(
     components, snippet, runner, wrapper, py_snippet, py_runner, py_env
 ):
-
     # Get python snippet layout
     app = py_source_to_app(
         PY_WRAPPER.format(
@@ -102,9 +98,8 @@ def dashjl(request, dashjl_server, tmpdir):
 
 @pytest.mark.parametrize("config", PARAMS)
 def test_snippets(dash_duo, dashr, dashjl, config):
-    path, data = config
-
-    env = ENVS[path.name]
+    md_path, data = config
+    env = ENVS.get(md_path.name)
 
     file_types = {
         "R": {
@@ -133,69 +128,71 @@ def test_snippets(dash_duo, dashr, dashjl, config):
     rename = len([i[1] for i in data]) != len(set([i[1] for i in data]))
 
     # Concatenate all the snippets in the markdown file together
-    for filepath, name in data:
-        if filepath not in SKIP:
+    for snippet_path, name in data:
+        if snippet_path in SKIP:
+            continue
 
-            filepath = HERE.parent / clean_path(filepath)
+        snippet_path = HERE.parent / clean_path(snippet_path)
+        new_component_name = name
 
-            new_component_name = name
-
-            # Some components are named the same - this renames them
-            if rename:
-                py_snippet = []
-                with filepath.open() as f:
-                    for line in f.readlines():
-                        new_line = line
-                        if new_line.startswith(f"{name} ="):
-                            new_component_name = f"{name}_{counter}"
-                            py_snippet.append(
-                                f"{new_component_name} ="
-                                + new_line[len(f"{name} =") :]
-                            )
-                            counter += 1
-                        else:
-                            py_snippet.append(new_line)
-                py_snippet = "".join(py_snippet)
-            else:
-                py_snippet = filepath.read_text()
-
-            # Now get the data for each file type
-            for file_type, meta in file_types.items():
-                # Get the file path
-                snippet_file = (
-                    filepath.parent / f"{filepath.stem}.{meta['file_ext']}"
-                )
-
-                # Check a snippet exists
-                if snippet_file.exists():
-                    py_data[file_type].append(py_snippet)
-                    # Add the component details
-                    components[file_type].append(new_component_name)
-
-                    # If we changed the name, then do it again here on the new file
-                    if rename and new_component_name != name:
-                        snippet = []
-                        with snippet_file.open() as f:
-                            for line in f.readlines():
-                                new_line = line
-                                if new_line.startswith(
-                                    f"{name} {meta['assignment_op']}"
-                                ):
-                                    snippet.append(
-                                        f"{new_component_name} {meta['assignment_op']}"
-                                        + new_line[
-                                            len(
-                                                f"{name} {meta['assignment_op']}"
-                                            ) :
-                                        ]
-                                    )
-
-                                else:
-                                    snippet.append(new_line)
-
-                        snippets[file_type].append("".join(snippet))
+        # Some components are named the same - this renames them
+        if rename:
+            py_snippet = []
+            with snippet_path.open() as f:
+                for line in f.readlines():
+                    new_line = line
+                    if new_line.startswith(f"{name} ="):
+                        new_component_name = f"{name}_{counter}"
+                        py_snippet.append(
+                            f"{new_component_name} ="
+                            + new_line[len(f"{name} =") :]
+                        )
+                        counter += 1
                     else:
-                        snippets[file_type].append(snippet_file.read_text())
+                        py_snippet.append(new_line)
+            py_snippet = "".join(py_snippet)
+        else:
+            py_snippet = snippet_path.read_text()
+
+        # Now get the data for each file type
+        for file_type, meta in file_types.items():
+            # Get the file path
+            snippet_file = (
+                snippet_path.parent / f"{snippet_path.stem}.{meta['file_ext']}"
+            )
+
+            # Check a snippet exists
+            if snippet_file.exists():
+                py_data[file_type].append(py_snippet)
+                # Add the component details
+                components[file_type].append(new_component_name)
+
+                # If we changed the name, then do it again here
+                if rename and new_component_name != name:
+                    snippet = []
+                    with snippet_file.open() as f:
+                        for line in f.readlines():
+                            new_line = line
+                            if new_line.startswith(
+                                f"{name} {meta['assignment_op']}"
+                            ):
+                                snippet.append(
+                                    f"{new_component_name} "
+                                    f"{meta['assignment_op']}"
+                                    + new_line[
+                                        len(
+                                            f"{name} "
+                                            f"{meta['assignment_op']}"
+                                        ) :
+                                    ]
+                                )
+
+                            else:
+                                snippet.append(new_line)
+
+                    snippets[file_type].append("".join(snippet))
+                else:
+                    snippets[file_type].append(snippet_file.read_text())
 
     assert all(
         [len(i) == len(set(i)) for _, i in components.items()]
@@ -204,7 +201,6 @@ def test_snippets(dash_duo, dashr, dashjl, config):
     # Test all the snippets match
     for file_type, meta in file_types.items():
         if len(components[file_type]) > 0:
-
             compare_layouts(
                 components=", ".join(components[file_type]),
                 snippet="\n".join(snippets[file_type]),
