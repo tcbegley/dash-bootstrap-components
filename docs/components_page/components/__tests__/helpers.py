@@ -34,16 +34,7 @@ def clean_path(path):
     return Path(path)
 
 
-def rename_variables(snippet_paths, variables, assign_op="="):
-    return [
-        rename_variable(snippet_path, i, variable, assign_op)
-        for i, (snippet_path, variable) in enumerate(
-            zip(snippet_paths, variables)
-        )
-    ]
-
-
-def rename_variable(snippet_path, suffix, variable, assign_op):
+def rename_variable(snippet_path, suffix, variable, assign_op="="):
     with snippet_path.open() as f:
         lines = f.read().split("\n")
 
@@ -56,7 +47,3 @@ def rename_variable(snippet_path, suffix, variable, assign_op):
         new_lines.append(line)
 
     return "\n".join(new_lines)
-
-
-def merge_snippets():
-    pass

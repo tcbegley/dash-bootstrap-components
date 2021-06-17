@@ -46,7 +46,13 @@ jobs:
       - name: Test installation
         run: library(dashBootstrapComponents)
         shell: Rscript {0}
+      - name: Setup Julia
+        uses: julia-actions/setup-julia@v1
+        with:
+          version: '1.6.1'
+      - name: Install Julia dependencies
+        run: julia -e 'using Pkg; Pkg.add(["Dash", "HTTP"]); Pkg.activate();'
       - name: Install nox
         run: python3.8 -m pip install -U nox
-      - name: Test R docs snippets
+      - name: Test R and Julia docs snippets
         run: nox -s doctest
