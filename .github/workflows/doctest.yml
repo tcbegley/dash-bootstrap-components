@@ -1,12 +1,12 @@
 name: Test doc snippets
 
-on:
-  push:
-    paths:
-      - docs/components_page/**
-  pull_request:
-    paths:
-      - docs/components_page/**
+on: [push, pull_request]
+  # push:
+  #   paths:
+  #     - docs/components_page/**
+  # pull_request:
+  #   paths:
+  #     - docs/components_page/**
 
 jobs:
   build-and-test:
@@ -36,23 +36,27 @@ jobs:
         run: python -m pip install -r requirements-dev.txt
       - name: Build dash-bootstrap-components
         run: npm run build
-      - name: Install R dependencies from cran2deb4ubuntu
-        run: |
-          sudo add-apt-repository ppa:c2d4u.team/c2d4u4.0+
-          sudo apt-get update
-          sudo apt-get install r-recommended r-cran-dash
-      - name: Install R package
-        run: sudo R CMD INSTALL .
-      - name: Test installation
-        run: library(dashBootstrapComponents)
-        shell: Rscript {0}
+      # - name: Install R dependencies from cran2deb4ubuntu
+      #   run: |
+      #     sudo add-apt-repository ppa:c2d4u.team/c2d4u4.0+
+      #     sudo apt-get update
+      #     sudo apt-get install r-recommended r-cran-dash
+      # - name: Install R package
+      #   run: sudo R CMD INSTALL .
+      # - name: Test installation
+      #   run: library(dashBootstrapComponents)
+      #   shell: Rscript {0}
       - name: Setup Julia
         uses: julia-actions/setup-julia@v1
         with:
           version: '1.6.1'
       - name: Install Julia dependencies
         run: julia -e 'using Pkg; Pkg.add(["Dash", "HTTP"]); Pkg.activate();'
-      - name: Install nox
-        run: python3.8 -m pip install -U nox
-      - name: Test R and Julia docs snippets
-        run: nox -s doctest
+      - name: Test Julia installation
+        run: julia -e 'using Dash, DashBootstrapComponents, HTTP;'
+      - name: Run test script
+        run: julia docs/components_page/components/jl_snippet.jl
+      # - name: Install nox
+      #   run: python3.8 -m pip install -U nox
+      # - name: Test R and Julia docs snippets
+      #   run: nox -s doctest

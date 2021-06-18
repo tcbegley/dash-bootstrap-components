@@ -24,7 +24,7 @@ PARAMS = [
         [match.split(":") for match in PATTERN.findall(path.read_text())],
     )
     for path in HERE.parent.glob("*.md")
-]
+][:1]
 
 SKIP = ["components/table/kwargs.py", "components/tabs/active_tab.py"]
 ENVS = {
@@ -130,6 +130,15 @@ def assert_layouts_equal(
     )
     py_runner.start(app, port=py_port)
     py_layout = requests.get(f"{py_runner.url}/_dash-layout").json()
+
+    with open("jl_snippet.jl", "w") as f:
+        f.write(
+            wrapper.format(
+                snippet="\n".join(x[1] for x in compare),
+                components=", ".join(x[2] for x in compare),
+                port=port,
+            )
+        )
 
     # Get other language snippet layout
     runner.start(
