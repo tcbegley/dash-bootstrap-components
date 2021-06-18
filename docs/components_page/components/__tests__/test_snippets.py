@@ -24,7 +24,7 @@ PARAMS = [
         [match.split(":") for match in PATTERN.findall(path.read_text())],
     )
     for path in HERE.parent.glob("*.md")
-][:1]
+]
 
 SKIP = ["components/table/kwargs.py", "components/tabs/active_tab.py"]
 ENVS = {
@@ -51,38 +51,38 @@ def dashjl_server():
         yield starter
 
 
-# @pytest.mark.parametrize("config", PARAMS)
-# def test_r_snippets(dash_thread_server, dashr_server, dashjl_server, config):
-#     md_path, data = config
-#     env = ENVS.get(md_path.name)
+@pytest.mark.parametrize("config", PARAMS)
+def test_r_snippets(dash_thread_server, dashr_server, dashjl_server, config):
+    md_path, data = config
+    env = ENVS.get(md_path.name)
 
-#     python_r_compare = []
+    python_r_compare = []
 
-#     # Concatenate all the snippets in the markdown file together
-#     for i, (snippet_path, name) in enumerate(data):
-#         if snippet_path in SKIP:
-#             continue
+    # Concatenate all the snippets in the markdown file together
+    for i, (snippet_path, name) in enumerate(data):
+        if snippet_path in SKIP:
+            continue
 
-#         snippet_path = HERE.parent / clean_path(snippet_path)
-#         py_snippet = rename_variable(snippet_path, i, name)
+        snippet_path = HERE.parent / clean_path(snippet_path)
+        py_snippet = rename_variable(snippet_path, i, name)
 
-#         r_snippet_path = snippet_path.parent / f"{snippet_path.stem}.R"
+        r_snippet_path = snippet_path.parent / f"{snippet_path.stem}.R"
 
-#         if r_snippet_path.exists():
-#             r_snippet = rename_variable(
-#                 r_snippet_path, i, name, assign_op="<-"
-#             )
-#             python_r_compare.append((py_snippet, r_snippet, f"{name}_{i}"))
+        if r_snippet_path.exists():
+            r_snippet = rename_variable(
+                r_snippet_path, i, name, assign_op="<-"
+            )
+            python_r_compare.append((py_snippet, r_snippet, f"{name}_{i}"))
 
-#     assert_layouts_equal(
-#         python_r_compare,
-#         dashr_server,
-#         R_WRAPPER,
-#         R_PORT,
-#         dash_thread_server,
-#         env,
-#         8050,
-#     )
+    assert_layouts_equal(
+        python_r_compare,
+        dashr_server,
+        R_WRAPPER,
+        R_PORT,
+        dash_thread_server,
+        env,
+        8050,
+    )
 
 
 @pytest.mark.parametrize("config", PARAMS)
