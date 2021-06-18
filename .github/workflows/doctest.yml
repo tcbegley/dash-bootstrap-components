@@ -55,7 +55,7 @@ jobs:
           git add -f deps src/*.jl Project.toml
           git -c user.name="GitHub Actions" -c user.email="actions@github.com" commit -m "Add Julia build artifacts"
       - name: Install Julia dependencies
-        run: julia -e 'using Pkg; Pkg.add(["Dash", "HTTP"]); Pkg.add(path=".");'
+        run: julia -e 'using Pkg; Pkg.add(["Dash", "DashCoreComponents", "DashHtmlComponents", "HTTP"]); Pkg.add(path=".");'
       - name: Test Julia installation
         run: julia -e 'using Dash, DashBootstrapComponents, HTTP;'
       - name: Run test script
