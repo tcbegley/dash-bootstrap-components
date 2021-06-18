@@ -2,14 +2,11 @@
 Automated testing of non-Python code snippets in the docs
 """
 import re
-import time
 import unittest
 from pathlib import Path
 
 import pytest
 import requests
-
-# from dash.testing.composite import DashRComposite, DashJuliaComposite
 from dash.testing.application_runners import JuliaRunner, RRunner
 
 from .helpers import clean_path, drop_keys, py_source_to_app, rename_variable
@@ -52,7 +49,7 @@ def dashjl_server():
 
 
 @pytest.mark.parametrize("config", PARAMS)
-def test_r_snippets(dash_thread_server, dashr_server, dashjl_server, config):
+def test_r_snippets(dash_thread_server, dashr_server, config):
     md_path, data = config
     env = ENVS.get(md_path.name)
 
@@ -130,15 +127,6 @@ def assert_layouts_equal(
     )
     py_runner.start(app, port=py_port)
     py_layout = requests.get(f"{py_runner.url}/_dash-layout").json()
-
-    with open("jl_snippet.jl", "w") as f:
-        f.write(
-            wrapper.format(
-                snippet="\n".join(x[1] for x in compare),
-                components=", ".join(x[2] for x in compare),
-                port=port,
-            )
-        )
 
     # Get other language snippet layout
     runner.start(
