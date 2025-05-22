@@ -72,7 +72,7 @@ deploy-docs: _copy-examples
     git add docs/examples/vendor/*.py -f
     git commit -m "Add examples" --allow-empty
     git subtree split --prefix docs -b docs-deploy
-    git push -f origin docs-deploy
+    git push -f tcbegley docs-deploy
     git checkout main
     git branch -D just-push-docs docs-deploy
 
